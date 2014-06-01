@@ -66,22 +66,25 @@ dotchart(x$mpg,labels=row.names(x),cex=.7,groups= x$cyl,
 ## 直方图：连续变量的分布
 
 # 分布函数
+x <- mtcars$mpg
 h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", prob=F ,
         main="Histogram with Normal Curve") 
 xfit<-seq(min(x),max(x),length=40) 
 yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) # 正态分布可以这么画，其他分布参考分布函数
 yfit <- yfit*diff(h$mids[1:2])*length(x) 
 lines(xfit, yfit, col="blue", lwd=2)
-
+# 累计分布函数
+plot(ecdf(x),verticals = TRUE, do.p = FALSE) 
+lines(x, pnorm(x, mean(x), sd(x)), col = "red")
+# QQ图
+qqnorm(x); qqline(x, col = "red")
 # 密度函数
-x <- mtcars$mpg 
 h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", prob=T ,
         main="Histogram with Normal Curve") 
 lines(density(x))
 
 # 离散变量直方图
 plot( table(mtcars$carb), type="h" , lwd=5 )
-head(iris)
 
 
 ### 多变量
@@ -145,6 +148,13 @@ cal<-corresp(USPersonalExpenditure,nf=2) ;
 biplot(cal,expand=1.5, xlim=c(-0.5 , 0.5), ylim=c(-0.1 , 0.15))
 abline(v=0,h=0,lty=3) 
 
+## 主成分分析碎石图
+pca <- princomp( iris[,-5], cor = T)
+summary(pca, loadings=T, cutoff= 0.01)
+screeplot( pca , type="lines" )
+load <- loadings(pca)
+plot(load[,1:2] ); text( load[,1], load[,2], adj=c(0.01,0.01))
+
 ## 系统聚类：样本距离的衡量
 dist <-dist(scale(iris[,c(1:4)]))
 hc <- hclust(dist, "ward")
@@ -166,6 +176,35 @@ for (n in c(63, 60, 76, 74)) {
 }
 dev.off()
 
+# 可视化：用空plot搭建框架，line描结构，polygon填内容
+par(bg="grey25");#背景
+plot(x=c(1),y=c(2.5),xlim=c(0,5),col="gray27",ylim=c(0,10),axes=F,ann=F,pch=20);#坐标
+#画线
+lines(c(1,1),c(2.5,8),col=col1,lwd=5);
+lines(c(2,2),c(2.5,8),col=col1,lwd=5);
+lines(c(2,2),c(0,2.5),col=col2,lwd=5);
+lines(c(3,3),c(2,4.7),col=col2,lwd=5);
+lines(c(3,3),c(4.7,6),col=col3,lwd=5);
+lines(c(3,3),c(6,8),col=col1,lwd=5);
+lines(c(4,4),c(1,3.5),col=col2,lwd=5);
+lines(c(4,4),c(3.5,4.8),col=col3,lwd=5);
+lines(c(4,4),c(4.8,6.2),col=col1,lwd=5);
+lines(c(4,4),c(6.2,7.2),col=col2,lwd=5);
+lines(c(4,4),c(7.2,8),col=col1,lwd=5);
+#画矩阵
+polygon(c(1,2,2,1),c(2.5,2.5,8,8),col=col1,border=col1,density=c(100));
+polygon(c(2,3,3,2),c(6,6,8,8),col=col1,border=col1,density=c(100));
+polygon(c(3,4,4,3),c(6,4.8,6.2,7.2),col=col1,border=col1,density=c(100));
+polygon(c(3,4,4,3),c(7.2,7.2,8,8),col=col1,border=col1,density=c(100));
+polygon(c(2,3,3,2),c(0,2,4.7,2.5),col=col1,border=col1,density=c(100));
+polygon(c(3,4,4,3),c(2,1,3.5,4.7),col=col2,border=col2,density=c(100));
+polygon(c(3,4,4,3),c(2,1,3.5,4.7),col=col2,border=col2,density=c(100));
+polygon(c(3,4,4,3),c(4.7,3.5,4.8,6),col=col3,border=col3,density=c(100));
+#文字
+text(c(1:4),c(8.5),labels=c(paste("version",1:4,sep="")),col="white");
+text( 0.5 ,c(1.0,0.5,0),labels=c("mary","suzanne","martin"),col=c(col1,col2,col3));
+dev.off()
+
 # 热力图，用于展现相同数值在两个维度上的水平/相关系数
 library(RColorBrewer)
 data <- VADeaths
@@ -173,8 +212,8 @@ pal=brewer.pal(4,"YlOrRd")
 breaks<-c(0, 15, 26, 44, 72)
 layout(matrix(data=c(1,2),  nrow=1, ncol=2), widths=c(8,1),
        heights=c(1,1))  ## 画一个空白的图形画板，按照参数把图形区域分隔好
-## 看layout的分割可以这样：
-## xx <- layout(matrix(data=c(1,2),  nrow=1, ncol=2), widths=c(8,1), heights=c(1,1)) ; layout.show(xx)
+# 看layout的分割可以这样：
+# xx <- layout(matrix(data=c(1,2),  nrow=1, ncol=2), widths=c(8,1), heights=c(1,1)) ; layout.show(xx)
 par(mar = c(2,6,4,1 ), oma=c(0.1, 0.1 ,0.1 , 0.1), mex = 1.2 ) #Set margins for the heatmap
 image(x=1:nrow(data),
       y=1:ncol(data),
