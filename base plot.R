@@ -296,6 +296,18 @@ dev.off()
 
 # 待增补
 
+# 函数图
+y1 <- function(x) {
+  (2*x+sqrt(5-21*x^2))/5
+}
+y2 <- function(x) {
+  (2*x-sqrt(5-21*x^2))/5
+}
+
+low <- -sqrt(5/21)
+high <- sqrt(5/21)
+curve(y1, low, high, ylim=c(low, high))
+curve(y2, low, high, add=T)
 
 
 
