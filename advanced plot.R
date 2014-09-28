@@ -48,5 +48,5 @@ ggplot( birthwt1, aes( x = bwt, color=smoke)) + geom_density( alpha = 0.3)
 
 
 
-
+# 加courera学到的决策树的图！以及特征选择图！
 
