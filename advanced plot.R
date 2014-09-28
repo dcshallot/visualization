@@ -47,6 +47,39 @@ birthwt1$smoke <- factor( birthwt1$smoke )
 ggplot( birthwt1, aes( x = bwt, color=smoke)) + geom_density( alpha = 0.3)
 
 
+# 相关矩阵图
+mcor <- cor(mtcars , use="complete.obs" )
+round( mcor, digits = 2 )
+library(corrplot)
+corrplot(mcor , method="shade", addCoef.col = "white", type="lower", tl.srt =45 )
 
-# 加courera学到的决策树的图！以及特征选择图！
+# 列联表的可视化：马赛克图
+ftable(UCBAdmissions)
+dimnames(UCBAdmissions)
+library(vcd)
+mosaic( ~ Admit + Gender + Dept, data = UCBAdmissions, 
+        highlighting ="Admit", highlighting_fill =c("lightblue", "pink" ),
+        direction =c("v","h","v"))
 
+mosaic( ~ Admit + Gender + Dept, data = UCBAdmissions, 
+        highlighting ="Admit", highlighting_fill =c("lightblue", "pink" ),
+        direction =c("v","v","h"))
+
+mosaic( ~ Admit + Gender + Dept, data = UCBAdmissions, 
+        highlighting ="Admit", highlighting_fill =c("lightblue", "pink" ),
+        direction =c("h","h","v"))
+
+
+# 决策树的图！
+library(caret)
+data(iris)
+inTrain <- createDataPartition( y = iris$Species, p=0.75, list=F)
+training <- iris[inTrain, ]
+testing <- iris[-inTrain, ]
+modFit <- train( Species ~ . , method="rpart", data= training)
+print( modFit$finalModel)
+library(rattle);library(rpart.plot)
+fancyRpartPlot( modFit$finalModel)
+
+
+## 以及特征选择图！
