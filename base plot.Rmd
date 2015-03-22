@@ -6,10 +6,32 @@ output: html_document
 ---
 
 # Abstract
+Update: 2015-03-22
 Purpose:  
-讨论常见图形的命令、参数和效果，尽量用R基础功能实现，效果不输excel    
+讨论常见图形的命令、参数和效果，尽量用R基础功能实现，效果不输excel   
+
 Data Used:       iris, VADeaths    
 Packages Used:   MASS,RColorBrewer    
+
+# 目录
+## 描述数据的频数
+- 条形图
+- 饼图
+- 多点图
+- 分布图
+- 箱线图
+## 描述数据的关系
+- plot的功能: 应用场景？
+- 对应分析图
+- 热力图
+- 主成分分析碎石图
+- 聚类图
+## 参数
+
+## 奇葩
+- 随机点艺术
+- 色块图
+
 
 # 离散变量图:用汇总后的数据
 
@@ -18,6 +40,7 @@ Packages Used:   MASS,RColorBrewer
 ```{r}
 # base barplot
 barplot( table(iris[,5]) )
+plot( table(iris[,5]), type = "h")
 ```
 
 more bars   
@@ -54,12 +77,6 @@ lbls <- paste(lbls,"%",sep="") # ad % to labels
 pie(slices,labels = lbls, col=rainbow(length(lbls)),
     main="Pie Chart of Countries")
 
-#3D Exploded Pie Chart
-library(plotrix)
-slices <- c(10, 12, 4, 16, 8) 
-lbls <- c("US", "UK", "Australia", "Germany", "France")
-pie3D(slices,labels=lbls,explode=0.1,
-      main="Pie Chart of Countries ")
 ```
 
 ## 点图：适合很多列别的数据
