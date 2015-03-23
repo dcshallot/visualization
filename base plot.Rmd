@@ -6,63 +6,79 @@ output: html_document
 ---
 
 # Abstract
-Update: 2015-03-22
+Update: 2015-03-22  
 Purpose:  
 讨论常见图形的命令、参数和效果，尽量用R基础功能实现，效果不输excel   
-
-Data Used:       iris, VADeaths    
+Data Used:       iris, VADeaths...    
 Packages Used:   MASS,RColorBrewer    
 
-# 目录
-## 描述数据的频数
-- 条形图
-- 饼图
-- 多点图
-- 分布图
-- 箱线图
-## 描述数据的关系
-- plot的功能: 应用场景？
-- 对应分析图
-- 热力图
-- 主成分分析碎石图
-- 聚类图
-## 参数
 
-## 奇葩
-- 随机点艺术
-- 色块图
+# 单变量的频数
 
-
-# 离散变量图:用汇总后的数据
-
-## 条形图
-
+## 单变量的条形图
 ```{r}
-# base barplot
-barplot( table(iris[,5]) )
-plot( table(iris[,5]), type = "h")
-```
+# 统计汇总条形图
+l <- aggregate( Sepal.Length ~ Species, data= iris, mean); l # 数据是这样的
 
-more bars   
-
-```{r}
-#统计汇总条形图
-l <- aggregate( Sepal.Length ~ Species, data= iris, mean)
 x <- barplot( l[,2] ,  col=terrain.colors(3) , xlim=c(0,5), ylim=c(0,8) ,axe=F, names.arg = l[,1] )
 y <- as.matrix( l[,2] )
 text( x, y+1, labels=l[,2], col="black" ) #柱顶标注，y +n调节标注高度，横放图则调x+n
-legend(legend=l[,1], "right", pch=15, col=terrain.colors(3) )
+legend(legend=l[,1], "right", pch=15, col=terrain.colors(3) ) # 图例
+
 ```
 
-grouped bars   
-
+## 堆砌和分组的条形图：列联表的可视化
 ```{r}
-# 堆砌和分组
 l <- table( mtcars$cyl , mtcars$gear);l
+par( mfrow= c(2,1))
 barplot( l, beside=T, main = "car tpyes: cyl and gear", 
          names.arg=c( "gear=3","gear=4","gear=5"), legend=c("cyl=4", "cly=6", "cyl=8"))
 barplot( l, beside=F, main = "car tpyes: cyl and gear", 
          names.arg=c( "gear=3","gear=4","gear=5"), legend=c("cyl=4", "cly=6", "cyl=8"))
+par( mfrow= c(1,1))
+```
+
+## 点图：单变量的分类展示，适合类别很多的情况
+```{r}
+# Dotplot: Grouped Sorted and Colored
+# Sort by mpg, group and color by cylinder 
+x <- mtcars[order(mtcars$mpg),] # sort by mpg
+x$cyl <- factor(x$cyl) # it must be a factor
+x$color[x$cyl==4] <- "red"
+x$color[x$cyl==6] <- "blue"
+x$color[x$cyl==8] <- "darkgreen" 
+dotchart(x$mpg,labels=row.names(x),cex=.7,groups= x$cyl,
+         main="Gas Milage for Car Models\ngrouped by cylinder",
+         xlab="Miles Per Gallon", gcolor="black", color=x$color)
+
+```
+
+
+## 频数分布：用原始数据，而非汇总
+```{r}
+x <- mtcars$mpg
+# 频数分布
+h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", prob=F ,
+        main="Histogram with Normal Curve") 
+
+# 添加拟合曲线
+xfit<-seq(min(x),max(x),length=40) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) # 正态分布可以这么画，其他分布参考分布函数
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="blue", lwd=2)
+
+# 累计分布函数
+plot(ecdf(x),verticals = TRUE, do.p = FALSE) 
+lines(x, pnorm(x, mean(x), sd(x)), col = "red")
+
+# QQ图
+qqnorm(x); qqline(x, col = "red")
+
+# 密度函数
+h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", prob=T ,
+        main="Histogram with Normal Curve") 
+lines(density(x))
+
 ```
 
 ## 饼图
@@ -79,56 +95,17 @@ pie(slices,labels = lbls, col=rainbow(length(lbls)),
 
 ```
 
-## 点图：适合很多列别的数据
 
-```{r}
-# Dotplot: Grouped Sorted and Colored
-# Sort by mpg, group and color by cylinder 
-x <- mtcars[order(mtcars$mpg),] # sort by mpg
-x$cyl <- factor(x$cyl) # it must be a factor
-x$color[x$cyl==4] <- "red"
-x$color[x$cyl==6] <- "blue"
-x$color[x$cyl==8] <- "darkgreen" 
-dotchart(x$mpg,labels=row.names(x),cex=.7,groups= x$cyl,
-         main="Gas Milage for Car Models\ngrouped by cylinder",
-         xlab="Miles Per Gallon", gcolor="black", color=x$color)
-
-```
-
-# 连续变量图：一般都用原始数据，而非汇总数据做
-
-## 数据的分布
-```{r}
-x <- mtcars$mpg
-h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", prob=F ,
-        main="Histogram with Normal Curve") 
-xfit<-seq(min(x),max(x),length=40) 
-yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) # 正态分布可以这么画，其他分布参考分布函数
-yfit <- yfit*diff(h$mids[1:2])*length(x) 
-lines(xfit, yfit, col="blue", lwd=2)
-
-# 累计分布函数
-plot(ecdf(x),verticals = TRUE, do.p = FALSE) 
-lines(x, pnorm(x, mean(x), sd(x)), col = "red")
-
-# QQ图
-qqnorm(x); qqline(x, col = "red")
-# 密度函数
-h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", prob=T ,
-        main="Histogram with Normal Curve") 
-lines(density(x))
-
-# 离散变量直方图
-plot( table(mtcars$carb), type="h" , lwd=5 )
-```
-
-# 多变量
+# 变量之间的关系
 
 ## 箱线图：连续变量VS离散变量
 ```{r}
 boxplot( Petal.Length ~ Species , data = iris , outline = F  ) # 离群值不显示
-boxplot( mpg ~ cyl * gear, data = mtcars , varwidth=T ) # 箱体宽度由样本量决定
+boxplot( mpg ~ cyl * gear, data = mtcars , varwidth=T , # 箱体宽度由样本量决定
+  xlab = "cyl (4-8) * gear (3-5)" )
+
 ```
+
 
 ## plot族
 
@@ -139,25 +116,28 @@ plot(cars$dist~cars$speed, # y~x
      xlab="Speed (miles per hour)", #X axis title
      ylab="Distance travelled (miles)", #Y axis title
      xlim=c(0,30), 
-     #Set x axis limits from 0 to 30 ylim=c(0,140), 
-     #Set y axis limits from 0 to  30140  xaxs="i", 
-     #Set x axis style as internal 
      yaxs="i", #Set y axis style as internal  
      col="red", #Set the colour of plotting symbol to red 
      pch=19) #Set the plotting symbol to filled dots
 
 
-# 分类散点图
-# 先将鸢尾花的类型转化为整数1 、2 、3，便于使用向量
-idx = as.integer(iris[["Species"]])
-plot(iris[, 3:4], pch = c(24, 21, 25)[idx], col = c("black","red", "blue")[idx], panel.first = grid())
-legend("topleft", legend = levels(iris[["Species"]]), col = c("black", "red", "blue"),
-       pch = c(24, 21, 25), bty = "n")
-
-
-# 散点矩阵图
+# 多变量的散点图矩阵
 pairs( ~ Sepal.Length + Sepal.Width + Petal.Length +Petal.Width, data=iris)
+plot(  ~ Sepal.Length + Sepal.Width + Petal.Length +Petal.Width, data=iris )
 
+
+# 分类散点图
+
+str(iris)
+idx = as.integer(iris[["Species"]]) # 先将鸢尾花的类型转化为整数1 、2 、3，便于使用向量
+plot(iris[, 3:4],   # 数据长和宽
+     pch = c(24, 21, 25)[idx],  # 注意这里integer的用法
+     col = c("black","red", "blue")[idx], 
+     panel.first = grid())
+legend("topleft", 
+       legend = levels(iris[["Species"]]), 
+       col = c("black", "red", "blue"),
+       pch = c(24, 21, 25), bty = "n")
 
 ## matplot 分类散点图，强化类别差异的表现
 nam.var <- colnames(iris)[-5]
@@ -172,6 +152,7 @@ matplot(iris.S[, "Petal.Length",], iris.S[, "Petal.Width",], pch = "SCV",
         main = "Fisher's Iris Data")
 
 ```
+
 
 ## 用散点图表示时间序列数据
 ```{r}
@@ -188,32 +169,7 @@ grid()
 
 ```
 
-# 复杂图形(复杂一点而已)
 
-## 对应分析：两个或多个变量之间的对应关系
-```{r}
-library(MASS)
-cal<-corresp(USPersonalExpenditure,nf=2) ;
-biplot(cal,expand=1.5, xlim=c(-0.5 , 0.5), ylim=c(-0.1 , 0.15))
-abline(v=0,h=0,lty=3) 
-```
-
-## 主成分分析碎石图
-```{r}
-pca <- princomp( iris[,-5], cor = T)
-summary(pca, loadings=T, cutoff= 0.01)
-screeplot( pca , type="lines" )
-load <- loadings(pca)
-plot(load[,1:2] ); text( load[,1], load[,2], adj=c(0.01,0.01))
-```
-
-## 系统聚类：样本距离的衡量
-```{r}
-dist <-dist(scale(iris[,c(1:4)]))
-hc <- hclust(dist, "ward")
-plclust(hc,hang=-1 ,  labels=iris[,5]  )
-re<-rect.hclust(hc,k=4,border="red")
-```
 
 ## 随机点的艺术作品
 ```{r}
@@ -224,8 +180,8 @@ for (n in c(63, 60, 76, 74)) {
   size = c(replicate(n, 1/rbeta(2, 1.5, 4)))
   center = t(replicate(n, runif(2)))
   center = center[rep(1:n, each = 2), ]
-  color = apply(replicate(2 * n, sample(c(0:9,
-                                          LETTERS[1:6]), 8, TRUE)), 2, function(x) sprintf("#%s", paste(x, collapse = "")))
+  color = apply( replicate(2 * n, sample(c(0:9,
+    LETTERS[1:6]), 8, TRUE)), 2, function(x) sprintf("#%s", paste(x, collapse = "")))
   points(center, cex = size, pch = rep(20:21, n),  col = color)
   box()
 }
@@ -315,6 +271,35 @@ curve(y2, low, high, add=T)
 
 # 参数参考
 
+## 玩全局参数
+```{r}
+par("lty") # line type, "blank", "solid", "dashed", "dotted", "dotdash", "longdash", or "twodash"
+par( lty = "dashed")
+par( "bg") # background color
+par(bg = "grey")
+par("mar")
+par( mar = c( 1,1,1,1) )
+par("mfrow") # n plot in one canvas
+par(mfrow = c(1,2))
+par( "oma") # outer margine
+par( oma = c(0,0,2,0)) 
+barplot( table(iris[,5]))
+
+
+# a example of mult-plots
+par( mfrow = c(1,2), oma = c(0,0,2,0)) # oma outer margine
+
+with( airquality, {
+  plot( Wind, Ozone, main = "Ozone and Wind")
+  plot( Solar.R, Ozone, main = "Ozone and Solar Radiation")
+  mtext( "Ozone and Weather in New York City", outer = TRUE)
+})
+
+
+dev.off()
+```
+
+
 ## 玩线条形状
 ```{r}
 x <- c(1:5); y <- x # create some data 
@@ -326,6 +311,7 @@ for(i in 1:length(opts)){
   plot(x, y, type="n", main=heading) 
   lines(x, y, type=opts[i]) 
 }
+
 
 ```
 

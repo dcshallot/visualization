@@ -6,6 +6,37 @@
 # Data Used:       iris, VADeaths
 # Packages Used:   MASS,RColorBrewer
 
+
+
+# 复杂图形(复杂一点而已)
+
+## 对应分析：两个或多个变量之间的对应关系
+```{r}
+library(MASS)
+cal<-corresp(USPersonalExpenditure,nf=2) ;
+biplot(cal,expand=1.5, xlim=c(-0.5 , 0.5), ylim=c(-0.1 , 0.15))
+abline(v=0,h=0,lty=3) 
+```
+
+## 主成分分析碎石图
+```{r}
+pca <- princomp( iris[,-5], cor = T)
+summary(pca, loadings=T, cutoff= 0.01)
+screeplot( pca , type="lines" )
+load <- loadings(pca)
+plot(load[,1:2] ); text( load[,1], load[,2], adj=c(0.01,0.01))
+```
+
+## 系统聚类：样本距离的衡量
+```{r}
+dist <-dist(scale(iris[,c(1:4)]))
+hc <- hclust(dist, "ward")
+plclust(hc,hang=-1 ,  labels=iris[,5]  )
+re<-rect.hclust(hc,k=4,border="red")
+```
+
+
+
 library(ggplot2)
 
 # area plot
