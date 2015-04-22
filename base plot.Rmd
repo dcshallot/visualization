@@ -363,3 +363,26 @@ text(4, 9.8, "segments")
 
 ```
 
+______________________________________________________________
+
+# 待整理
+
+二维变量体现类别差异的展现方式
+
+```{r}
+
+summary( iris)
+
+library(car)
+class = as.character( iris$Species)
+scatterplot( Sepal.Length ~ Sepal.Width ,data = iris , 
+             groups = class , 
+            grid=TRUE,
+            smoother=FALSE, reg.line=FALSE, ellipse=TRUE)
+
+```
+
+
+
+
+
