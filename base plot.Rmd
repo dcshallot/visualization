@@ -151,6 +151,17 @@ matplot(iris.S[, "Petal.Length",], iris.S[, "Petal.Width",], pch = "SCV",
                     sep = "=", collapse= ",  "),
         main = "Fisher's Iris Data")
 
+
+## 二维变量体现类别差异的展现方式
+
+library(car)
+class = as.character( iris$Species)
+scatterplot( Sepal.Length ~ Sepal.Width ,data = iris , 
+             groups = class , 
+            grid=TRUE,
+            smoother=FALSE, reg.line=FALSE, ellipse=TRUE)
+
+
 ```
 
 
@@ -365,24 +376,104 @@ text(4, 9.8, "segments")
 
 ______________________________________________________________
 
-# 待整理
 
-二维变量体现类别差异的展现方式
+# 一般概念
+高水平（high-level）绘图函数   
+- 在图形设备上产生一个新的绘图区域，并生成一个新的图形
+- 通过其参数可以设置坐标轴，标签，标题等等
+低水平（low-level）绘图函数   
+- 在已存在的图形上加上更多的图形元素，是绘制图形的基础函数
+- 如额外的点、线、多边形和标签
+交互式绘图函数  
+- 允许交互式地用定点设备（如鼠标）在已经存在的图上添加/提取图形信息
+
+
+## coplot
+coplot()函数能够说明三向甚至四向关系，它特别于适合观察当给定其他预测变量时，反应变量如何根据一个预测变量变化。
 
 ```{r}
-
-summary( iris)
-
-library(car)
-class = as.character( iris$Species)
-scatterplot( Sepal.Length ~ Sepal.Width ,data = iris , 
-             groups = class , 
-            grid=TRUE,
-            smoother=FALSE, reg.line=FALSE, ellipse=TRUE)
-
+coplot( mtcars$wt ~ mtcars$mpg | as.factor(mtcars$cyl) * as.factor(mtcars$vs), 
+  main="", xlab="", ylab="", pch=19)
 ```
 
 
+## 文本和符号大小
+cex
+- cex.axis 坐标轴刻度标记的缩放比例
+- cex.lab 坐标轴标题的缩放比例
+- cex.main 指定主标题的缩放比例
+- cex.sub 子标题的缩放比例
 
+## 点类型
+pch 争取画一张各类型的点图出来
+
+lty(Line TYpe)
+参数值可以为整数或字符串：0=blank, 1=solid (default), 2=dashed, 3=dotted, 4=dotdash, 5=longdash, 6=twodash
+
+lwd(Line WiDth)
+设置线条的相对宽度，默认值为1
+
+
+col
+默认的绘图颜色
+col.axis
+坐标轴刻度标记的颜色
+col.lab
+坐标轴标题的颜色
+col.main
+主标题的颜色
+col.sub
+子标题的颜色
+fg
+设置前景色
+bg
+设置背景色
+
+
+font 1=普通, 2=粗体, 3=斜体, 4=粗斜体, 5=符号字体
+font.axis 坐标轴刻度标签的字体样式
+font.lab 坐标轴标题的字体
+font.main/font.sub 主标题/子标题的字体
+family 字体族，标准值包含“serif”, “sans”, “mono”, “symbol”，其映射依赖于具体的设备，在Windows设置中，分别被映射为” TT Times New Roman”、” TT Arial”、” TT Courier New”、” TT Symbol”（TT=True Type） 
+
+
+低水平绘图函数：点、直线、线段、箭头、网格线
+
+points 在当前绘图区增加点
+lines 在当前绘图区增加连接线
+abline(a,b)
+abline(h=y)
+abline(v=x)
+abline(lm:obj) 在当前绘图区增加一个斜率为b，截距为a的直线。
+h=y可用于指定贯穿整个图的水平线高度的y-坐标。
+v=x类似地用于指定垂直线的x-坐标。
+lm:obj 可能是一个有长度为2的coefficients 分量(如模型拟合的结果)的列表。该分量中依次含有截距和斜率。
+segments 绘制点对之间的线段
+arrows 绘制点对之间的箭头
+grid 在当前绘图区增加网格线
+
+
+## 基本实现
+plot(-4:4, -4:4, type = "p", col="blue")
+## 绘制点、连接点
+points(x=c(3,-2,-1,3,2), y=c(1,2,-2,2,3), col = "red")
+lines(x=c(3,-2,-1,3,2), y=c(1,2,-2,2,3),col="black")
+## 绘制直线
+abline(h=0)
+abline(v=0)
+abline(a=1,b=1)
+abline(lm(mtcars$mpg ~ mtcars$qsec),col="red")
+## 绘制线段
+segments(x0=2, y0=-4.5, x1=4, y1=-2, col="red", lty="dotted")
+## 绘制箭头,并设置箭头的长度、角度、样式
+arrows(x0=-4, y0=4, x1=-2, y1=0, length=0.15, angle=30, code=3)
+##绘制网格线
+grid(nx=3, ny=5, col = "lightgray", lty = "dotted")
+
+
+## 基本实现
+plot(-4:4, -4:4, type = "p", col="blue")
+polygon(x=c(3,-2,-1,3,2), y=c(1,2,-2,2,3), col = "red") # 绘制多边形
+rect(xleft=c(-4,0), ybottom=c(2,-4), xright=c(-2,2), ytop=c(4,-2), col = c("blue", "yellow")) # 绘制两个矩形，并填充颜色
 
 
