@@ -1,4 +1,3 @@
-
 # File-Name:       advanced plot.R           
 # Date:            2014-09-26                   
 # Author:          Chong Ding (chong.ding83@gmail.com)
@@ -114,3 +113,41 @@ fancyRpartPlot( modFit$finalModel)
 
 
 ## 以及特征选择图！
+
+
+
+## 热力图，用于展现相同数值在两个维度上的水平/相关系数
+```{r}
+library(RColorBrewer)
+data <- VADeaths
+pal=brewer.pal(4,"YlOrRd")
+breaks<-c(0, 15, 26, 44, 72)
+layout(matrix(data=c(1,2),  nrow=1, ncol=2), widths=c(8,1),
+       heights=c(1,1))  ## 画一个空白的图形画板，按照参数把图形区域分隔好
+# 看layout的分割可以这样：
+# xx <- layout(matrix(data=c(1,2),  nrow=1, ncol=2), widths=c(8,1), heights=c(1,1)) ; layout.show(xx)
+par(mar = c(2,6,4,1 ), oma=c(0.1, 0.1 ,0.1 , 0.1), mex = 1.2 ) #Set margins for the heatmap
+image(x=1:nrow(data),
+      y=1:ncol(data),
+      z=data,axes=FALSE,
+      xlab="Month",   ylab="", main="Sales Heat Map" ,
+      col=pal[1:(length(breaks)-1)],
+      breaks=breaks ) # breaks 颜色块对应的数值（数值分组），要比颜色数量多1个
+axis(1, col="white",las=1 , at=1:nrow(data), labels=rownames(data)  )
+axis(2, col="white",las=1 , at=1:ncol(data), labels=colnames(data)  )
+abline(h=c(1:ncol(data))+0.5, v=c(1:nrow(data))+0.5,  col="white",lwd=2,xpd=FALSE)
+# 画标尺
+breaks2 <- breaks[-length(breaks)]  # breaks 少一个
+par(mar = c(2,1,4,2))
+image(x = 1, y= 0:length(breaks2),
+      z=t(matrix(breaks2))*1.001,
+      col=pal[1:length(breaks)-1],
+      axes=FALSE,breaks=breaks,
+      xlab="", ylab="",xaxt="n")
+axis(4,at=0:(length(breaks2)-1), labels=breaks2, col="white", las=1)
+abline(h=c(1:length(breaks2)),col="white",lwd=2, xpd=F )
+
+```
+
+
+

@@ -16,6 +16,71 @@ Packages Used:   MASS,RColorBrewer
 # 单变量的频数
 
 ## 单变量的条形图
+
+```{r}
+barplot( airquality$Temp[ airquality$Month ==5 ] ) # 全月温度，其实barplot不合适
+barplot(  airquality$Temp[ airquality$Month ==5 ], horiz =T ) # 调过来
+barplot(  airquality$Temp[ airquality$Month ==5 ], width = c(1,2) )  # 箱体宽度
+barplot(  airquality$Temp[ airquality$Month ==5 ],border = "red" ,col = 'white')  # 颜色
+```
+
+
+## 基于plot的展示方式
+```{r}
+plot(  airquality$Temp[ airquality$Month ==5 ], type = 'h')
+```
+
+
+## 饼图
+```{r}
+# Pie Chart with Percentages
+slices <- c(10, 12, 4, 16, 8) 
+lbl <- c("US", "UK", "Australia", "Germany", "France")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbl, pct, "%", sep = " ") # add percents to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+    main="Pie Chart of Countries")
+```
+
+
+## 直方图
+```{r}
+x <- mtcars$mpg
+
+# 频数分布
+h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", 
+        prob=F , # prob = T 为密度曲线
+        main="Histogram with Normal Curve") 
+# 添加拟合曲线
+xfit<-seq(min(x),max(x),length=40) 
+yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) # 正态分布可以这么画，其他分布参考分布函数
+yfit <- yfit*diff(h$mids[1:2])*length(x) 
+lines(xfit, yfit, col="blue", lwd=2)
+
+# 累计分布函数
+plot(ecdf(x),verticals = TRUE, do.p = FALSE) 
+lines(x, pnorm(x, mean(x), sd(x)), col = "red")
+
+# QQ图
+qqnorm(x); qqline(x, col = "red")
+```
+
+
+
+# 多变量之间的关系
+
+
+## 箱线图：连续变量VS离散变量
+```{r}
+boxplot( Petal.Length ~ Species , data = iris , outline = F  ) # 离群值不显示
+boxplot( mpg ~ cyl * gear, data = mtcars , varwidth=T , # 箱体宽度由样本量决定
+  xlab = "cyl (4-8) * gear (3-5)" )
+
+```
+
+
+## 条形图：连续变量的分组（连续*离散）条形图
+
 ```{r}
 # 统计汇总条形图
 l <- aggregate( Sepal.Length ~ Species, data= iris, mean)
@@ -57,51 +122,6 @@ dotchart( x$mpg, labels=row.names(x), cex=.7, groups= x$cyl,
 ```
 
 
-## 频数分布：用原始数据，而非汇总
-```{r}
-x <- mtcars$mpg
-# 频数分布
-h<-hist(x, breaks=10, col="red", xlab="Miles Per Gallon", 
-        prob=F , # prob = T 为密度曲线
-        main="Histogram with Normal Curve") 
-# 添加拟合曲线
-xfit<-seq(min(x),max(x),length=40) 
-yfit<-dnorm(xfit,mean=mean(x),sd=sd(x)) # 正态分布可以这么画，其他分布参考分布函数
-yfit <- yfit*diff(h$mids[1:2])*length(x) 
-lines(xfit, yfit, col="blue", lwd=2)
-
-# 累计分布函数
-plot(ecdf(x),verticals = TRUE, do.p = FALSE) 
-lines(x, pnorm(x, mean(x), sd(x)), col = "red")
-
-# QQ图
-qqnorm(x); qqline(x, col = "red")
-```
-
-## 饼图
-```{r}
-# Pie Chart with Percentages
-slices <- c(10, 12, 4, 16, 8) 
-lbls <- c("US", "UK", "Australia", "Germany", "France")
-pct <- round(slices/sum(slices)*100)
-lbls <- paste(lbls, pct) # add percents to labels 
-lbls <- paste(lbls,"%",sep="") # ad % to labels 
-pie(slices,labels = lbls, col=rainbow(length(lbls)),
-    main="Pie Chart of Countries")
-```
-
-
-# 变量之间的关系
-
-## 箱线图：连续变量VS离散变量
-```{r}
-boxplot( Petal.Length ~ Species , data = iris , outline = F  ) # 离群值不显示
-boxplot( mpg ~ cyl * gear, data = mtcars , varwidth=T , # 箱体宽度由样本量决定
-  xlab = "cyl (4-8) * gear (3-5)" )
-
-```
-
-
 ## plot族
 高水平（high-level）绘图函数   
 - 在图形设备上产生一个新的绘图区域，并生成一个新的图形
@@ -112,6 +132,8 @@ boxplot( mpg ~ cyl * gear, data = mtcars , varwidth=T , # 箱体宽度由样本量决定
 交互式绘图函数  
 - 允许交互式地用定点设备（如鼠标）在已经存在的图上添加/提取图形信息
 
+
+### 简单散点图xy
 ```{r}
 
 # 简单漂亮的散点图：两个连续变量之间的关系
@@ -124,7 +146,11 @@ plot(cars$dist~cars$speed, # y~x
      yaxs="i", #Set y axis style as internal  
      col="red", #Set the colour of plotting symbol to red 
      pch=19) #Set the plotting symbol to filled dots
+```
 
+
+### 三维散点图(离散类别)
+```{r}
 
 # 分类散点图
 
@@ -138,6 +164,7 @@ legend("topleft",
        legend = levels(iris[["Species"]]), 
        col = c("black", "red", "blue"),
        pch = c(24, 21, 25), bty = "n")
+
 
 ## matplot 分类散点图，强化类别差异的表现
 nam.var <- colnames(iris)[-5]
@@ -162,6 +189,7 @@ scatterplot( Sepal.Length ~ Sepal.Width ,data = iris ,
             smoother=FALSE, reg.line=FALSE, ellipse=TRUE)
 ```
 
+
 ## coplot
 coplot()函数能够说明三向甚至四向关系  
 它特别于适合观察当给定其他预测变量时，反应变量如何根据一个预测变量变化。
@@ -169,40 +197,6 @@ coplot()函数能够说明三向甚至四向关系
 coplot( mtcars$wt ~ mtcars$mpg | as.factor(mtcars$cyl) * as.factor(mtcars$vs), 
   main="", xlab="", ylab="", pch=19)
 ```
-
-## 热力图，用于展现相同数值在两个维度上的水平/相关系数
-```{r}
-library(RColorBrewer)
-data <- VADeaths
-pal=brewer.pal(4,"YlOrRd")
-breaks<-c(0, 15, 26, 44, 72)
-layout(matrix(data=c(1,2),  nrow=1, ncol=2), widths=c(8,1),
-       heights=c(1,1))  ## 画一个空白的图形画板，按照参数把图形区域分隔好
-# 看layout的分割可以这样：
-# xx <- layout(matrix(data=c(1,2),  nrow=1, ncol=2), widths=c(8,1), heights=c(1,1)) ; layout.show(xx)
-par(mar = c(2,6,4,1 ), oma=c(0.1, 0.1 ,0.1 , 0.1), mex = 1.2 ) #Set margins for the heatmap
-image(x=1:nrow(data),
-      y=1:ncol(data),
-      z=data,axes=FALSE,
-      xlab="Month",   ylab="", main="Sales Heat Map" ,
-      col=pal[1:(length(breaks)-1)],
-      breaks=breaks ) # breaks 颜色块对应的数值（数值分组），要比颜色数量多1个
-axis(1, col="white",las=1 , at=1:nrow(data), labels=rownames(data)  )
-axis(2, col="white",las=1 , at=1:ncol(data), labels=colnames(data)  )
-abline(h=c(1:ncol(data))+0.5, v=c(1:nrow(data))+0.5,  col="white",lwd=2,xpd=FALSE)
-# 画标尺
-breaks2 <- breaks[-length(breaks)]  # breaks 少一个
-par(mar = c(2,1,4,2))
-image(x = 1, y= 0:length(breaks2),
-      z=t(matrix(breaks2))*1.001,
-      col=pal[1:length(breaks)-1],
-      axes=FALSE,breaks=breaks,
-      xlab="", ylab="",xaxt="n")
-axis(4,at=0:(length(breaks2)-1), labels=breaks2, col="white", las=1)
-abline(h=c(1:length(breaks2)),col="white",lwd=2, xpd=F )
-
-```
-
 
 
 ## 多变量的散点图矩阵
@@ -213,7 +207,9 @@ plot(  ~ Sepal.Length + Sepal.Width + Petal.Length +Petal.Width, data=iris )
 
 ```
 
+
 # 其他图形
+
 ## 用散点图表示时间序列数据
 ```{r}
 data <- VADeaths
