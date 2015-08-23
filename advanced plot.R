@@ -117,7 +117,6 @@ fancyRpartPlot( modFit$finalModel)
 
 
 ## 热力图，用于展现相同数值在两个维度上的水平/相关系数
-```{r}
 library(RColorBrewer)
 data <- VADeaths
 pal=brewer.pal(4,"YlOrRd")
@@ -147,7 +146,26 @@ image(x = 1, y= 0:length(breaks2),
 axis(4,at=0:(length(breaks2)-1), labels=breaks2, col="white", las=1)
 abline(h=c(1:length(breaks2)),col="white",lwd=2, xpd=F )
 
-```
+
+##—————————————————————————————— stack ————————————————————————————————————————
+
+
+# Function interaction.plot can be used to make spaghetti plots.
+# Let's use data set tolerance_pp.csv used in Applied Longitudinal Data Analysis:
+# Modeling Change and Event Occurrence by Judith D. Singer and John B. Willett for our example.
+# 适用于特定数据类型（分组1：X周，分组2：不同线条，数值:Y轴）的图形
+
+tolerance<-read.table("http://www.ats.ucla.edu/stat/r/faq/tolpp.csv",
+                      sep=",", header=T)
+head(tolerance, n=10)
+
+interaction.plot(tolerance$time,
+                 tolerance$id, tolerance$tolerance, xlab="time", ylab="Tolerance", legend=F)
+
+interaction.plot(tolerance$time,
+                tolerance$id, tolerance$tolerance,
+                xlab="time", ylab="Tolerance", col=c(1:10), legend= T) 
+
 
 
 
